@@ -1,0 +1,10 @@
+[package]
+name = "async-ssh2-tokio"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+async-ssh2-tokio = "*"
+tokio = "*"
+russh = "*"
+async-trait = "*"
