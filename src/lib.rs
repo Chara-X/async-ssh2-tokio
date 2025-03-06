@@ -6,5 +6,4 @@
 #![allow(clippy::module_inception)]
 #![allow(clippy::too_many_arguments)]
 //! [async_ssh2_tokio]
-mod client;
-pub use self::client::*;
+pub mod client;
