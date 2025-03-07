@@ -69,19 +69,25 @@ impl Client {
         command: &str,
     ) -> Result<CommandExecutedResult, async_ssh2_tokio::Error> {
         let mut stdout = vec![];
+        let mut stderr = vec![];
         let mut channel = self.handle.channel_open_session().await?;
         channel.exec(true, command).await?;
         let mut res: Option<u32> = None;
         while let Some(msg) = channel.wait().await {
             match msg {
                 russh::ChannelMsg::Data { ref data } => stdout.write_all(data).await.unwrap(),
+                russh::ChannelMsg::ExtendedData { ref data, ext } => {
+                    if ext == 1 {
+                        stderr.write_all(data).await.unwrap()
+                    }
+                }
                 russh::ChannelMsg::ExitStatus { exit_status } => res = Some(exit_status),
                 _ => {}
             }
         }
         Ok(CommandExecutedResult {
             stdout: String::from_utf8(stdout).unwrap(),
-            stderr: String::from_utf8(vec![]).unwrap(),
+            stderr: String::from_utf8(stderr).unwrap(),
             exit_status: res.unwrap(),
         })
     }
